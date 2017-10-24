@@ -3,6 +3,7 @@ import axios from 'axios'
 import Story from './Story'
 import StoryForm from './StoryForm'
 import update from 'immutability-helper'
+import Notification from './Notification'
 
 class StoriesContainer extends Component {
     constructor(props) {
@@ -10,7 +11,8 @@ class StoriesContainer extends Component {
       this.state = {
         stories: [],
         editingStoryId: null,
-        notification: ''
+        notification: '',
+        transitionIn: false
       }
     }
 
@@ -35,7 +37,7 @@ class StoriesContainer extends Component {
     updateStory = (story) => {
       const storyIndex = this.state.stories.findIndex(x => x.id === story.id)
       const stories = update(this.state.stories, {[storyIndex]: {$set: story}})
-      this.setState({stories: stories, notification: 'All changes saved'})
+      this.setState({stories: stories, notification: 'All changes saved', transitionIn: true})
     }
 
     deleteStory = (id) => {
@@ -47,7 +49,7 @@ class StoriesContainer extends Component {
       })
     }
 
-    resetNotification = () => {this.setState({notification: ''})}
+    resetNotification = () => {this.setState({notification: '', transitionIn: false})}
 
     enableEditing = (id) => {
       this.setState({editingStoryId: id}, () => {this.title.focus()})
@@ -60,9 +62,7 @@ class StoriesContainer extends Component {
                 <button className='newStoryBtn' onClick={this.addNewStory}>
                   New Story
                 </button>
-                <span className='notification'>
-                  {this.state.notification}
-                </span>
+                <Notification in={this.state.transitionIn} notification={this.state.notification} />
               </div>
               {this.state.stories.map((story) => {
                 if(this.state.editingStoryId === story.id) {
